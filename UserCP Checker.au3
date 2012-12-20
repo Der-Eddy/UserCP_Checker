@@ -1,11 +1,12 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Icon=.\epvp.ico
+#AutoIt3Wrapper_Icon=epvp.ico
 #AutoIt3Wrapper_Compression=4
-#AutoIt3Wrapper_UseUpx=n
 #AutoIt3Wrapper_Res_Description=UserCP Checker for Elitepvpers
 #AutoIt3Wrapper_Res_Fileversion=2.3.1.0
 #AutoIt3Wrapper_Res_LegalCopyright=by Der-Eddy
 #AutoIt3Wrapper_Res_Language=1031
+#AutoIt3Wrapper_Run_Obfuscator=y
+#Obfuscator_Parameters=/striponlyincludes /om
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #include <ButtonConstants.au3>
 #include <EditConstants.au3>
@@ -19,10 +20,12 @@
 #include <GDIPlus.au3>
 #Include <GuiButton.au3>
 #Include <File.au3>
+#Include <Misc.au3>
 #include "Include\_Growl.au3" ; Danke an 0xcafebabe von autoitscript.com
 #include "Include\GetHWID.au3" ; Danke an KillerDeluxe
+#Obfuscator_Off
 #include "Include\WebTcp.au3" ; Danke an AMrK von autoitbot.de
-#include "Include\Misc.au3" ; Gescnittene Version von Misc.au3
+#Obfuscator_On
 
 #region Log GUI
 $log = "Starte Tool ..."
@@ -38,7 +41,8 @@ AdlibRegister("_hotkey", 250)
 
 ; Variablen
 Global $epvp1, $epvp1_, $epvp_1, $epvp2, $epvp2_, $epvp_2, $epvp3, $epvp3_, $epvp_3, $epvp4, $epvp4_, $epvp_4, $epvp44, $epvp5, $epvp5_, $epvp_5, $epvp55, $epvp6, $epvp_6, $epvp66, $epvp_7, $epvp_77, $epvp_8, $epvp_88, $epvp_9, $epvp_99
-Global $GUI1, $GUI1_, $Input1, $Input1_, $Input2, $Input2_, $Checkbox1, $Checkbox1_, $Form1, $Form2, $Label1, $Label2, $Labelsafe, $Button1, $Button2, $Form3, $Labeli, $Labela, $Update, $GUI2, $noti, $forum, $about, $settings, $topic, $combo, $combo2
+Global $GUI1, $GUI1_, $Input1, $Input1_, $Input2, $Input2_, $Checkbox1, $Checkbox1_, $Form1, $Form2, $Label1, $Label2, $Labelsafe, $Button1, $Button2, $Form3, $Labeli, $Labela, $Update, $GUI2, $noti, $forum, $about, $settings, $topic
+Global $combo, $combo2, $extras, $thread, $radio, $radio1, $radio2, $posts, $activ1, $activ2, $threadlab, $threadpost, $activ1old, $activ2old, $open1, $open2, $opencheck, $approval1, $approval2, $approvalcheck, $opencheckbox, $approvalcheckbox
 Global $bID, $bPW, $PWs, $source, $Benutzer, $pass, $sUsername, $sUserpassMD5, $oHTTP, $Source_n, $pic, $Pic, $hBmp, $image, $name, $group, $password, $t, $t2, $oWebTCP, $bLoggedIn, $name, $hwid, $i, $skip, $version2, $down, $growlid, $rungrowl, $gstring, $notification
 Global $a1[2], $a2[2], $a3[2], $a3[2], $a4[2], $a5[2], $a6[2], $a7[2], $a8[2], $a9[2], $a10[2], $a11[2], $a12[2], $a13[2], $a14[2], $a15[2], $a16[2], $a17[2], $a18[2]
 Global $dUrl, $dText, $dPath, $downgui, $prozentold, $Prozent, $dProgress, $ddownload, $LabelProzent, $Labelspeed, $Labelcopy, $timer, $size
@@ -46,7 +50,7 @@ Global $Tray, $Trayb, $Traye, $Trayf, $Trayi, $Trayt, $Trayu
 Global $notifications[1][1] = [["Notifcation"]]
 Global $soundfiles[10], $sounds[1]
 Global $skip[19], $prem2[1], $long2[1]
-Global $version = "2.3.1"
+Global $version = "2.4"
 Global $prem = "XIII"
 Global $long = "XXV"
 Global $uDebug = False ; Bei True wird gefragt ob man die neueste Version runterladen möchte
@@ -65,6 +69,7 @@ Opt("GUIOnEventMode", 1)
 Opt("MustDeclareVars", 1)
 Opt("TrayMenuMode",3)
 Opt("TrayOnEventMode",1)
+Opt("TrayIconHide", 0)
 Opt("GUICloseOnESC",1)
 Opt("GUIEventOptions",1)
 
@@ -80,6 +85,7 @@ FileInstall(".\Sounds\Beep 1.wav", $sound & "Beep 1.wav")
 FileInstall(".\Sounds\Beep 2.wav", $sound & "Beep 2.wav")
 FileInstall(".\Sounds\Blop.wav", $sound & "Blop.wav")
 FileInstall(".\Sounds\Button.wav", $sound & "Button.wav")
+If NOT FileExists($temp & "progress.gif") Then InetGet("http://www.elitepvpers.com/forum/images/misc/progress.gif", $temp & "progress.gif")
 
 ; Traymenü
 $Tray = TrayCreateItem("Benachrichtungen")
@@ -213,12 +219,12 @@ Else
 EndIf
 
 #region GUI2 ; GUI 2
-$Form2 = GUICreate("UserCP Checker", 350, 325)
+$Form2 = GUICreate("UserCP Checker", 380, 345)
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Exit")
 GUISetOnEvent($GUI_EVENT_MINIMIZE, "_Tray")
-$Button2 = GUICtrlCreateButton("Speichern und starten", 50, 290, 250, 25, $WS_GROUP)
+$Button2 = GUICtrlCreateButton("Speichern und starten", 65, 310, 250, 25, $WS_GROUP)
 GUICtrlSetOnEvent(-1, "Save")
-GUICtrlCreateTab(12, 12, 330, 270)
+GUICtrlCreateTab(12, 12, 360, 290)
 $noti = GUICtrlCreateTabItem("Benachrichtungen")
 $epvp1_ = GUICtrlCreateCheckbox("Neue Private Nachrichten", 25, 40)
 $epvp2_ = GUICtrlCreateCheckbox("Neue Profilnachrichten", 25, 65)
@@ -276,6 +282,7 @@ $epvp_9 = GUICtrlCreateCheckbox(" ", 25, $t + 125)
 $epvp_99 = GUICtrlCreateInput(IniRead($file, "Foren", "Check3", ""), 42, $t + 127, 250)
 
 $settings = GUICtrlCreateTabItem("Einstellungen")
+;GUICtrlSetState(-1, $GUI_SHOW)
 $Label1 = GUICtrlCreateLabel("Benutzername:", 26, 46, 75, 17)
 $Label2 = GUICtrlCreateLabel("Passwort:", 26, 70, 50, 17)
 $Input1_ = GUICtrlCreateInput("", 106, 43, 137, 21)
@@ -284,27 +291,71 @@ $Checkbox1_ = GUICtrlCreateCheckbox("Passwort speichern?", 26, 102, 129, 17)
 $Labelsafe = GUICtrlCreateLabel("", 200, 430)
 GUICtrlCreateButton("Konfigurationsdatei öffnen", 30, 130)
 GUICtrlSetOnEvent(-1, "data")
-GUICtrlCreateButton("Konfigurationsdatei löschen", 180, 130)
+GUICtrlCreateButton("Konfigurationsdatei löschen", 210, 130)
 GUICtrlSetOnEvent(-1, "datadelete")
 GUICtrlSetTip(-1, "Das Tool muss dafür neu gestartet werden!")
 GUICtrlCreateLabel("Pfad: ", 30, 170)
 GUICtrlSetCursor(-1, 0)
 GUICtrlSetOnEvent(-1, "Path")
-GUICtrlCreateInput($temp, 70, 166, 245, -1, $ES_READONLY)
+GUICtrlCreateInput($temp, 70, 166, 277, -1, $ES_READONLY)
 GUICtrlCreateLabel("Sound: ", 30, 198)
-$combo = GUICtrlCreateCombo("Keiner", 70, 195, 190)
+$combo = GUICtrlCreateCombo("Keiner", 70, 195, 222)
 
 $sounds = _FileListToArray($sound, "*.wav")
 For $i = 1 To $sounds[0]
 	$soundfiles = StringRegExp($sounds[$i], "(.*?).wav", 1)
 	GUICtrlSetData($combo, $soundfiles[0], IniRead($file, "Benutzerdaten", "Sound", "Keiner"))
 Next
-GUICtrlCreateButton("Play", 265, 193, 50)
+GUICtrlCreateButton("Play", 298, 193, 50)
 GUICtrlSetOnEvent(-1, "sound")
 
 GUICtrlCreateLabel("Benachrichtigungen über: ", 30, 225)
-$combo2 = GUICtrlCreateCombo("Tray", 157, 222, 158)
+$combo2 = GUICtrlCreateCombo("Tray", 157, 222, 190)
 GUICtrlSetData(-1, "Growl", IniRead($file, "Benutzerdaten", "Notification", "Tray"))
+
+
+$extras = GUICtrlCreateTabItem("Extras")
+GUICtrlSetState(-1, $GUI_SHOW)
+GUICtrlCreateGroup("Thread Checker", 20, 40, 342, 100)
+$threadlab = GUICtrlCreateLabel("Thread:", 30, 63, -1 , -1, $WS_DISABLED)
+GUICtrlSetTip(-1, "Der eingefügt Thread muss nicht abonniert sein")
+$thread = GUICtrlCreateInput(IniRead($file, "Thread", "Thread", ""), 75, 60, 280, 20, $WS_DISABLED)
+$radio1 = GUICtrlCreateRadio("Bei neuen Beiträgen", 30, 85)
+GUICtrlSetState(-1, $GUI_DISABLE)
+$radio2 = GUICtrlCreateRadio("Bei", 30, 110)
+GUICtrlSetState(-1, $GUI_DISABLE)
+$posts = GUICtrlCreateInput(IniRead($file, "Thread", "Posts", "2"), 72, 110, 72, -1, BitOR($WS_DISABLED, $ES_NUMBER))
+GUICtrlSetLimit(-1, 9)
+$threadpost = GUICtrlCreateLabel("Beiträgen", 150, 113, -1, -1, $WS_DISABLED)
+$activ1 = GUICtrlCreateCheckbox("Aktiv?", 250, 95)
+$activ1old = GUICtrlRead($activ1)
+
+GUICtrlCreateGroup("ModFE Checker", 20, 145, 342, 125)
+$open1 = GUICtrlCreateLabel("Offene Reports:", 30, 165, -1, -1, $WS_DISABLED)
+$open2 = GUICtrlCreateLabel("-", 110, 159, 300, 100, $WS_DISABLED)
+GUICtrlSetFont(-1, 14, 500, 0)
+GUICtrlSetColor(-1, 0xfcad22)
+$opencheck = GUICtrlCreateButton("Check", 250, 159, 80, -1, $WS_DISABLED)
+$approval1 = GUICtrlCreateLabel("Offene Approvals:", 30, 195, -1, -1, $WS_DISABLED)
+$approval2 = GUICtrlCreateLabel("-", 120, 189, 300, 100, $WS_DISABLED)
+GUICtrlSetFont(-1, 14, 500, 0)
+GUICtrlSetColor(-1, 0xfcad22)
+$approvalcheck = GUICtrlCreateButton("Check", 250, 189, 80, -1, $WS_DISABLED)
+$opencheckbox = GUICtrlCreateCheckbox("Benachrichtigen bei neuen Reports", 30, 215, -1, -1, $WS_DISABLED)
+$approvalcheckbox = GUICtrlCreateCheckbox("Benachrichtigen bei neuen Approvals", 30, 240, -1, -1, $WS_DISABLED)
+
+Switch IniRead($file, "Benutzerdaten", "Group", "Level One")
+Case "Moderators", "Global Moderators", "Co-Administrators", "Administrators"
+	GUICtrlSetState($open1, $GUI_ENABLE)
+	GUICtrlSetState($open2, $GUI_ENABLE)
+	GUICtrlSetState($opencheck, $GUI_ENABLE)
+	GUICtrlSetState($opencheckbox, $GUI_ENABLE)
+	GUICtrlSetState($approval1, $GUI_ENABLE)
+	GUICtrlSetState($approval2, $GUI_ENABLE)
+	GUICtrlSetState($approvalcheck, $GUI_ENABLE)
+	GUICtrlSetState($approvalcheckbox, $GUI_ENABLE)
+EndSwitch
+
 
 $about = GUICtrlCreateTabItem("Info")
 ;GUICtrlSetState(-1, $GUI_SHOW)
@@ -314,7 +365,7 @@ _GDIPlus_Startup ()
 $image = _GDIPlus_ImageLoadFromFile($temp & "epvp.png")
 $hBmp = _GDIPlus_BitmapCreateHBITMAPFromBitmap($image)
 GUICtrlSendMsg($Pic, $STM_SETIMAGE, 0, $hBmp)
-GUICtrlCreateLabel("UserCP Checker", 125, 55, 200, 200)
+GUICtrlCreateLabel("UserCP Checker", 125, 55, 300, 200)
 GUICtrlSetFont(-1, 20, 500, 0)
 GUICtrlCreateLabel("Version: " & $version, 126, 90, 200, 200)
 GUICtrlSetFont(-1, 8,5, 500, 0)
@@ -362,77 +413,47 @@ GUICtrlCreateLabel("Marcoly (Foren IDs)", 77, 265, 200, 200)
 #region Abfragen ; If-Abfragen für das GUI
 $log = "Lese Konfigurationen aus ..." & @CRLF & $log
 GUICtrlSetData($labellog, $log)
-If IniRead($file, "Benachrichtungen", "Epvp1", "4") <> 4 Then
-	GUICtrlSetState($epvp1_, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Benachrichtungen", "Epvp2", "4") <> 4 Then
-	GUICtrlSetState($epvp2_, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Benachrichtungen", "Epvp3", "4") <> 4 Then
-	GUICtrlSetState($epvp3_, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Benachrichtungen", "EoE", "4") <> 4 Then
-	GUICtrlSetState($epvp4_, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Foren", "M. Main", "4") <> 4 Then
-	GUICtrlSetState($epvp_1, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Foren", "CA", "4") <> 4 Then
-	GUICtrlSetState($epvp_2, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Foren", "P. Main", "4") <> 4 Then
-	GUICtrlSetState($epvp_3, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Foren", "Main", "4") <> 4 Then
-	GUICtrlSetState($epvp_4, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Foren", "Minecraft", "4") <> 4 Then
-	GUICtrlSetState($epvp_5, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Foren", "Terraria", "4") <> 4 Then
-	GUICtrlSetState($epvp_6, $GUI_CHECKED)
-EndIf
-If NOT IniRead($file, "Foren", "Check1", "") = "" Then
-	GUICtrlSetState($epvp_7, $GUI_CHECKED)
-EndIf
-If NOT IniRead($file, "Foren", "Check2", "") = "" Then
-	GUICtrlSetState($epvp_8, $GUI_CHECKED)
-EndIf
-If NOT IniRead($file, "Foren", "Check3", "") = "" Then
-	GUICtrlSetState($epvp_9, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Themen", "P. Longest", "4") <> 4 Then
-	GUICtrlSetState($epvp1, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Themen", "Longest", "4") <> 4 Then
-	GUICtrlSetState($epvp2, $GUI_CHECKED)
-EndIf
-If IniRead($file, "Themen", "Funny", "4") <> 4 Then
-	GUICtrlSetState($epvp3, $GUI_CHECKED)
-EndIf
-If NOT IniRead($file, "Themen", "Check1", "") = "" Then
-	GUICtrlSetState($epvp4, $GUI_CHECKED)
-EndIf
-If NOT IniRead($file, "Themen", "Check2", "") = "" Then
-	GUICtrlSetState($epvp5, $GUI_CHECKED)
-EndIf
-If NOT IniRead($file, "Themen", "Check3", "") = "" Then
-	GUICtrlSetState($epvp6, $GUI_CHECKED)
-EndIf
-
-GUIDelete($GUIlog)
-
-If IniRead($file, "Benachrichtungen", "EoE", "4") = 1 Then
-	Ueberpruefung()
+If IniRead($file, "Benachrichtungen", "Epvp1", "4") <> 4 Then GUICtrlSetState($epvp1_, $GUI_CHECKED)
+If IniRead($file, "Benachrichtungen", "Epvp2", "4") <> 4 Then GUICtrlSetState($epvp2_, $GUI_CHECKED)
+If IniRead($file, "Benachrichtungen", "Epvp3", "4") <> 4 Then GUICtrlSetState($epvp3_, $GUI_CHECKED)
+If IniRead($file, "Benachrichtungen", "EoE", "4") <> 4 Then GUICtrlSetState($epvp4_, $GUI_CHECKED)
+If IniRead($file, "Foren", "M. Main", "4") <> 4 Then GUICtrlSetState($epvp_1, $GUI_CHECKED)
+If IniRead($file, "Foren", "CA", "4") <> 4 Then GUICtrlSetState($epvp_2, $GUI_CHECKED)
+If IniRead($file, "Foren", "P. Main", "4") <> 4 Then GUICtrlSetState($epvp_3, $GUI_CHECKED)
+If IniRead($file, "Foren", "Main", "4") <> 4 Then GUICtrlSetState($epvp_4, $GUI_CHECKED)
+If IniRead($file, "Foren", "Minecraft", "4") <> 4 Then GUICtrlSetState($epvp_5, $GUI_CHECKED)
+If IniRead($file, "Foren", "Terraria", "4") <> 4 Then GUICtrlSetState($epvp_6, $GUI_CHECKED)
+If NOT IniRead($file, "Foren", "Check1", "") = "" Then GUICtrlSetState($epvp_7, $GUI_CHECKED)
+If NOT IniRead($file, "Foren", "Check2", "") = "" Then GUICtrlSetState($epvp_8, $GUI_CHECKED)
+If NOT IniRead($file, "Foren", "Check3", "") = "" Then GUICtrlSetState($epvp_9, $GUI_CHECKED)
+If IniRead($file, "Themen", "P. Longest", "4") <> 4 Then GUICtrlSetState($epvp1, $GUI_CHECKED)
+If IniRead($file, "Themen", "Longest", "4") <> 4 Then GUICtrlSetState($epvp2, $GUI_CHECKED)
+If IniRead($file, "Themen", "Funny", "4") <> 4 Then GUICtrlSetState($epvp3, $GUI_CHECKED)
+If NOT IniRead($file, "Themen", "Check1", "") = "" Then GUICtrlSetState($epvp4, $GUI_CHECKED)
+If NOT IniRead($file, "Themen", "Check2", "") = "" Then GUICtrlSetState($epvp5, $GUI_CHECKED)
+If NOT IniRead($file, "Themen", "Check3", "") = "" Then GUICtrlSetState($epvp6, $GUI_CHECKED)
+If IniRead($file, "Thread", "Activ", "4") <> 4 Then GUICtrlSetState($activ1, $GUI_CHECKED)
+If IniRead($file, "Thread", "Radio", "4") <> 4 Then
+	GUICtrlSetState($radio1, $GUI_CHECKED)
 Else
-	GUISetState(@SW_SHOW)
+	GUICtrlSetState($radio2, $GUI_CHECKED)
 EndIf
-#endregion
-#endregion
+If IniRead($file, "ModFE", "Open", "4") <> 4 Then GUICtrlSetState($opencheckbox, $GUI_CHECKED)
+If IniRead($file, "ModFE", "Approval", "4") <> 4 Then GUICtrlSetState($approvalcheckbox, $GUI_CHECKED)
 
 $Benutzer = IniRead($file, "Benutzerdaten", "ID", "default")
 
 $pass = StringLower(StringTrimLeft(_Crypt_HashData($password, $CALG_MD5), 2))
+
+GUIDelete($GUIlog)
+If IniRead($file, "Benachrichtungen", "EoE", "4") = 1 Then
+	Ueberpruefung()
+Else
+	GUISetState(@SW_SHOW)
+	AdlibRegister("Activ", 200)
+EndIf
+#endregion
+#endregion
 
 ;Save()
 
@@ -576,6 +597,12 @@ Func Save() ; Speichert alle Änderungen
 	IniWrite($file, "Themen", "Check1", GUICtrlRead($epvp44))
 	IniWrite($file, "Themen", "Check2", GUICtrlRead($epvp55))
 	IniWrite($file, "Themen", "Check3", GUICtrlRead($epvp66))
+	IniWrite($file, "Thread", "Activ", GUICtrlRead($activ1))
+	IniWrite($file, "Thread", "Thread", GUICtrlRead($thread))
+	IniWrite($file, "Thread", "Radio", GUICtrlRead($radio1))
+	IniWrite($file, "Thread", "Posts", GUICtrlRead($posts))
+	IniWrite($file, "ModFE", "Open", GUICtrlRead($opencheckbox))
+	IniWrite($file, "ModFE", "Approval", GUICtrlRead($approvalcheckbox))
 	If GUICtrlRead($Input2_) <> "" And GUICtrlRead($Input1_) <> "" Then
 		IniWrite($file, "Benutzerdaten", "ID", GUICtrlRead($Input1_))
 		If GUICtrlRead($Checkbox1_) = 1 Then
@@ -587,8 +614,30 @@ Func Save() ; Speichert alle Änderungen
 	IniWrite($file, "Benutzerdaten", "Sound", GUICtrlRead($combo))
 	IniWrite($file, "Benutzerdaten", "Notification", GUICtrlRead($combo2))
 	If GUICtrlRead($combo2) = "Growl" Then Growl()
+	AdlibUnRegister("Activ")
 	Ueberpruefung()
 EndFunc ;==>Save
+
+Func Activ() ; Aktiviert bzw. Deativiert Controls im Extras Tab
+	If GUICtrlRead($activ1) = 1 AND $activ1old = 4 Then
+		GUICtrlSetState($threadlab, $GUI_ENABLE)
+		GUICtrlSetState($thread, $GUI_ENABLE)
+		GUICtrlSetState($radio1, $GUI_ENABLE)
+		GUICtrlSetState($radio2, $GUI_ENABLE)
+		GUICtrlSetState($posts, $GUI_ENABLE)
+		GUICtrlSetState($threadpost, $GUI_ENABLE)
+		$activ1old = GUICtrlRead($activ1)
+	EndIf
+	If GUICtrlRead($activ1) = 4 AND $activ1old = 1 Then
+		GUICtrlSetState($threadlab, $GUI_DISABLE)
+		GUICtrlSetState($thread, $GUI_DISABLE)
+		GUICtrlSetState($radio1, $GUI_DISABLE)
+		GUICtrlSetState($radio2, $GUI_DISABLE)
+		GUICtrlSetState($posts, $GUI_DISABLE)
+		GUICtrlSetState($threadpost, $GUI_DISABLE)
+		$activ1old = GUICtrlRead($activ1)
+	EndIf
+EndFunc
 
 Func Ueberpruefung()
 	GUISetState(@SW_HIDE)
