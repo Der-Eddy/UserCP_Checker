@@ -1,7 +1,7 @@
 # UserCP_Checker
 Benachrichtigungen vom Forum elitepvpers.com mithilfe des User Control Panels
 
-Mit Windows TrayInfo und Growl Support
+Mit Windows TrayTip und Growl Support
 
 Original Thema: [UserCP Checker - Elitepvpers](http://www.elitepvpers.com/forum/coding-releases/1905049-usercp-checker-bleib-immer-auf-dem-neuesten-stand.html)
 
